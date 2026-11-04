@@ -63,6 +63,18 @@ function mudarAba(nomeAba) {
 
     event.currentTarget.classList.add('active');
 }
+// Função para alternar modo tela cheia (Ideal para uso no painel do veículo)
+function alternarTelaCheia() {
+    if (!document.fullscreenElement) {
+        document.documentElement.requestFullscreen().catch(err => {
+            console.error(`Erro ao tentar ativar tela cheia: ${err.message}`);
+        });
+    } else {
+        if (document.exitFullscreen) {
+            document.exitFullscreen();
+        }
+    }
+}
 
 // 2. Instanciação e Conexão do Simulador com a Interface
 const telemetria = new SimuladorTelemetria((dados) => {
