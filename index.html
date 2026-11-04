@@ -3,136 +3,130 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>FleetManager Pro - Telemetria B2B</title>
-    <link rel="stylesheet" href="fleet-style.css">
+    <title>Telemetria - Midnight Tech</title>
+    <link rel="stylesheet" href="style.css">
+    <!-- Na sua barra de status superior, adicione este botão compacto: -->
+<header class="status-bar">
+    <span id="system-status" class="badge-online">● SISTEMA ATIVO</span>
+    <span id="trip-time">Tempo: 00:00</span>
+    <button id="btn-fullscreen" class="btn-fullscreen" onclick="alternarTelaCheia()" title="Tela Cheia">⛶</button>
+</header>
 </head>
 <body>
-    <div class="fleet-container">
+    <div class="dashboard-container">
         
-        <!-- BARRA LATERAL DE NAVEGAÇÃO CORPORATIVA -->
-        <aside class="sidebar">
-            <h2>Fleet<span>Manager</span></h2>
-            <ul class="menu-list">
-                <li class="active">📊 Monitoramento Ao Vivo</li>
-                <li>🚚 Frota & Motoristas</li>
-                <li>🗺️ Rotas e Cerca Virtual</li>
-                <li>📈 Relatórios de Desempenho</li>
-                <li>⚙️ Configurações da API Java</li>
-            </ul>
-        </aside>
-
-        <!-- CONTEÚDO PRINCIPAL DO GESTOR -->
-        <main class="main-content">
-            <header class="fleet-header">
-                <div>
-                    <h1>Central de Operações da Frota</h1>
-                    <span class="sub-title">Monitoramento GSM/GPS em Tempo Real</span>
-                </div>
-                <span class="badge-server">Backend Java Spring Boot: <strong style="color: #00ff66;">● ONLINE (Port 8080)</strong></span>
+        <!-- ================= TELA 1: DASHBOARD PRINCIPAL ================= -->
+        <div id="view-dashboard" class="view-section active">
+            <!-- Barra de Status Superior -->
+            <header class="status-bar">
+                <span id="system-status" class="badge-online">● SISTEMA ATIVO</span>
+                <span id="trip-time">Tempo: 00:00</span>
             </header>
 
-            <!-- Cards Resumo Executivo da Frota -->
-            <section class="metrics-grid">
-                <div class="fleet-card">
-                    <span class="label">Veículos Conectados</span>
-                    <h2>12 <span class="unit">/ 15</span></h2>
+            <!-- Topo: RPM e Velocidade -->
+            <section class="top-panel">
+                <div class="card rpm-card">
+                    <span class="label">RPM do Motor</span>
+                    <h2 id="rpm-value">0</h2>
                 </div>
-                <div class="fleet-card">
-                    <span class="label">Eficiência Média da Frota</span>
-                    <h2>13.8 <span class="unit">Km/L</span></h2>
-                </div>
-                <div class="fleet-card">
-                    <span class="label">Custo Total Hoje</span>
-                    <h2>R$ 482,50</h2>
-                </div>
-                <div class="fleet-card alert-card">
-                    <span class="label">Alertas Críticos</span>
-                    <h2 style="color: var(--alert-red);">2 Ativos</h2>
+                <div class="card speed-card">
+                    <span class="label">Velocidade</span>
+                    <h2 id="speed-value">0 <span class="unit">km/h</span></h2>
                 </div>
             </section>
 
-            <!-- Área Dividida: Lista de Veículos + Telemetria Detalhada + Mapa -->
-            <section class="dashboard-split">
-                
-                <!-- Coluna da Esquerda: Lista de Veículos -->
-                <div class="fleet-card vehicle-list-card">
-                    <h3>Frota Ativa</h3>
-                    <div class="search-box">
-                        <input type="text" placeholder="Filtrar por placa ou motorista...">
-                    </div>
-                    <ul class="vehicle-ul">
-                        <li class="vehicle-item selected" onclick="selecionarVeiculo('Corsa 1.0 (ABC-1234)', 'João Silva', '82 km/h', '14.2 Km/L', 'Normal')">
-                            <div>
-                                <strong>Chevrolet Corsa 1.0 <span class="plate">ABC-1234</span></strong>
-                                <small>Motorista: João Silva • Em movimento</small>
-                            </div>
+            <!-- Centro: Indicador Geral de Eficiência e Custo -->
+            <main class="center-panel">
+                <div class="card efficiency-card">
+                    <span class="label">Rendimento Geral da Viagem</span>
+                    <h1 id="efficiency-value">0.0 <span class="unit">Km/L</span></h1>
+                    <p class="sub-metric">Total Consumido: <strong id="total-litros">0.00</strong> L</p>
+                    <p class="sub-metric-cost">Custo Estimado: <strong id="total-custo">R$ 0,00</strong></p>
+                </div>
+            </main>
+
+            <!-- Meio Inferior: Consumo Diferencial -->
+            <section class="bottom-panel">
+                <div class="card spatial-card">
+                    <span class="label">Espacial (Inst.)</span>
+                    <h3 id="spatial-value">0 <span class="unit">mL/Km</span></h3>
+                </div>
+                <div class="card temporal-card" id="temporal-card-bg">
+                    <span class="label">Temporal (Inst.)</span>
+                    <h3 id="temporal-value">0 <span class="unit">mL/Min</span></h3>
+                </div>
+            </section>
+
+            <!-- Base: Gráfico de Histograma -->
+            <footer class="chart-panel card">
+                <span class="label">Histograma de Consumo por Km</span>
+                <div class="canvas-container">
+                    <canvas id="histograma"></canvas>
+                </div>
+            </footer>
+        </div>
+
+        <!-- ================= TELA 2: HISTÓRICO DE VIAGENS ================= -->
+        <div id="view-history" class="view-section">
+            <header class="view-header">
+                <h2>Histórico de Viagens</h2>
+                <span class="label">Seus trajetos anteriores</span>
+            </header>
+            <div class="card history-card-container">
+                <ul id="history-list">
+                    <li class="history-item">
+                        <div class="history-info">
+                            <strong>Corsa Wind - Rota Urbana</strong>
+                            <small>Hoje, 14:30 • 4.2 km</small>
+                        </div>
+                        <div class="history-stats">
                             <span class="status-good">14.2 Km/L</span>
-                        </li>
-                        <li class="vehicle-item" onclick="selecionarVeiculo('Fiat Uno 1.4 (XYZ-5678)', 'Carlos Souza', '0 km/h', '9.1 Km/L', 'Marcha Lenta')">
-                            <div>
-                                <strong>Fiat Uno 1.4 <span class="plate">XYZ-5678</span></strong>
-                                <small>Motorista: Carlos Souza • Marcha Lenta</small>
-                            </div>
-                            <span class="status-bad">9.1 Km/L</span>
-                        </li>
-                        <li class="vehicle-item" onclick="selecionarVeiculo('VW Gol 1.6 (DEF-9012)', 'Marcos Lima', '65 km/h', '12.5 Km/L', 'Normal')">
-                            <div>
-                                <strong>VW Gol 1.6 <span class="plate">DEF-9012</span></strong>
-                                <small>Motorista: Marcos Lima • Em cruzeiro</small>
-                            </div>
-                            <span class="status-good">12.5 Km/L</span>
-                        </li>
-                    </ul>
+                            <small>R$ 4,20</small>
+                        </div>
+                    </li>
+                    <!-- Mais itens serão injetados via JS dinamicamente -->
+                </ul>
+            </div>
+        </div>
+
+        <!-- ================= TELA 3: CONFIGURAÇÕES E PERFIL ================= -->
+        <div id="view-settings" class="view-section">
+            <header class="view-header">
+                <h2>Configurações</h2>
+                <span class="label">Parâmetros do Veículo e Custos</span>
+            </header>
+            
+            <div class="card settings-card">
+                <div class="input-group">
+                    <label for="preco-combustivel">Preço do Combustível (R$/L)</label>
+                    <input type="number" id="preco-combustivel" value="5.89" step="0.01">
+                </div>
+                
+                <div class="input-group">
+                    <label for="perfil-veiculo">Perfil do Veículo</label>
+                    <input type="text" id="perfil-veiculo" value="Chevrolet Corsa 1.0 MPFI">
                 </div>
 
-                <!-- Coluna Central: Telemetria em Tempo Real do Veículo Selecionado -->
-                <div class="fleet-card telemetry-detail-card">
-                    <h3 id="selected-vehicle-title">Telemetria: Corsa 1.0 (ABC-1234)</h3>
-                    <div class="telemetry-grid">
-                        <div class="mini-card">
-                            <span class="label">Velocidade GPS</span>
-                            <h4 id="tel-speed">82 <span class="unit">km/h</span></h4>
-                        </div>
-                        <div class="mini-card">
-                            <span class="label">RPM do Motor</span>
-                            <h4 id="tel-rpm">2400 <span class="unit">RPM</span></h4>
-                        </div>
-                        <div class="mini-card">
-                            <span class="label">Consumo Instantâneo</span>
-                            <h4 id="tel-spatial">70 <span class="unit">mL/Km</span></h4>
-                        </div>
-                        <div class="mini-card">
-                            <span class="label">Status Atual</span>
-                            <h4 id="tel-status" class="status-good">Operação Eficiente</h4>
-                        </div>
-                    </div>
-                    
-                    <!-- Log de Alertas do Sistema -->
-                    <div class="alert-log-container">
-                        <span class="label">Log de Ocorrências e Alertas (GSM)</span>
-                        <ul class="alert-list">
-                            <li><span class="alert-time">14:42</span> Veículo XYZ-5678 permaneceu em marcha lenta por > 10 min.</li>
-                            <li><span class="alert-time">14:15</span> Rota iniciada para o veículo ABC-1234.</li>
-                        </ul>
-                    </div>
+                <div class="input-group">
+                    <label for="fator-sensor">Fator K dos Sensores (Pulsos/L)</label>
+                    <input type="number" id="fator-sensor" value="660">
                 </div>
 
-                <!-- Coluna da Direita: Mapa Geográfico (Google Maps / Leaflet) -->
-                <div class="fleet-card map-card">
-                    <h3>Rastreamento Geográfico (GPS)</h3>
-                    <div id="map-simulator-screen">
-                        <div class="map-placeholder-text">
-                            🗺️ [ Módulo de Mapa Geográfico ]<br>
-                            <small>Coordenadas: -23.5505, -46.6333 (São Paulo - SP)</small><br>
-                            <small style="color: var(--neon-blue);">● Rota ativa rastreada via satélite em tempo real</small>
-                        </div>
-                    </div>
-                </div>
+                <button id="btn-salvar-config" class="btn-primary">Salvar Alterações</button>
+            </div>
+        </div>
 
-            </section>
-        </main>
+        <!-- ================= MENU DE NAVEGAÇÃO INFERIOR ================= -->
+        <nav class="bottom-nav">
+            <button class="nav-btn active" onclick="mudarAba('dashboard')">📊 Painel</button>
+            <button class="nav-btn" onclick="mudarAba('history')">📜 Histórico</button>
+            <button class="nav-btn" onclick="mudarAba('settings')">⚙️ Ajustes</button>
+        </nav>
     </div>
-
-    <script src="fleet-app.js"></script>
+    
+    <!-- Scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="simulador.js"></script>
+    <script src="app.js"></script>
 </body>
 </html>
