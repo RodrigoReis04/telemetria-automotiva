@@ -1,0 +1,36 @@
+git status
+git add .
+git status
+git commit -m "fix: atualiza arquivos do projeto e layout responsivo"
+git push origin main
+
+
+
+
+
+Para testar como Gestor (B2B):
+
+E-mail: gestor@transportes.com 
+
+Senha: 123
+
+Perfil: Gestor de Frotas
+
+
+Para testar como Admin (Sua Empresa):
+
+E-mail: admin@telemetria.com
+
+Senha: admin
+
+Perfil: Administrador Master
+
+
+A Nova Estrutura Prática das Abas do B2B
+Com essas correções de negócio, o menu lateral do nosso painel de frotas (frota-web) fica muito mais enxuto, profissional e alinhado com o que há de mais moderno em SaaS:
+
+📊 Monitoramento Ao Vivo: O painel principal que já temos (mapa, lista de veículos contratados, telemetria em tempo real).
+
+🗺️ Otimização de Rotas (IA): O módulo onde a IA atua sugerindo ou avaliando rotas inteligentes e trajetos eficientes.
+
+📈 Relatórios & Laudos de IA: Onde o gestor clica em um botão ("Gerar Análise de Desempenho com IA") e o sistema processa a telemetria dos motoristas entregando um feedback textual inteligente de cada um.
