@@ -3,130 +3,80 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Telemetria - Midnight Tech</title>
+    <title>Telemetria Automotiva - Midnight Tech</title>
     <link rel="stylesheet" href="style.css">
-    <!-- Na sua barra de status superior, adicione este botão compacto: -->
-<header class="status-bar">
-    <span id="system-status" class="badge-online">● SISTEMA ATIVO</span>
-    <span id="trip-time">Tempo: 00:00</span>
-    <button id="btn-fullscreen" class="btn-fullscreen" onclick="alternarTelaCheia()" title="Tela Cheia">⛶</button>
-</header>
+    <!-- Chart.js para o gráfico de consumo em tempo real -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 <body>
     <div class="dashboard-container">
         
-        <!-- ================= TELA 1: DASHBOARD PRINCIPAL ================= -->
-        <div id="view-dashboard" class="view-section active">
-            <!-- Barra de Status Superior -->
-            <header class="status-bar">
-                <span id="system-status" class="badge-online">● SISTEMA ATIVO</span>
-                <span id="trip-time">Tempo: 00:00</span>
-            </header>
+        <!-- BARRA SUPERIOR DE STATUS -->
+        <header class="status-bar">
+            <span id="system-status" class="badge-online">● SISTEMA ATIVO</span>
+            <span id="trip-time">Tempo: 00:00</span>
+            <button id="btn-fullscreen" class="btn-fullscreen" onclick="alternarTelaCheia()" title="Tela Cheia">⛶</button>
+        </header>
 
-            <!-- Topo: RPM e Velocidade -->
-            <section class="top-panel">
-                <div class="card rpm-card">
-                    <span class="label">RPM do Motor</span>
-                    <h2 id="rpm-value">0</h2>
-                </div>
-                <div class="card speed-card">
-                    <span class="label">Velocidade</span>
-                    <h2 id="speed-value">0 <span class="unit">km/h</span></h2>
-                </div>
-            </section>
-
-            <!-- Centro: Indicador Geral de Eficiência e Custo -->
-            <main class="center-panel">
-                <div class="card efficiency-card">
-                    <span class="label">Rendimento Geral da Viagem</span>
-                    <h1 id="efficiency-value">0.0 <span class="unit">Km/L</span></h1>
-                    <p class="sub-metric">Total Consumido: <strong id="total-litros">0.00</strong> L</p>
-                    <p class="sub-metric-cost">Custo Estimado: <strong id="total-custo">R$ 0,00</strong></p>
-                </div>
-            </main>
-
-            <!-- Meio Inferior: Consumo Diferencial -->
-            <section class="bottom-panel">
-                <div class="card spatial-card">
-                    <span class="label">Espacial (Inst.)</span>
-                    <h3 id="spatial-value">0 <span class="unit">mL/Km</span></h3>
-                </div>
-                <div class="card temporal-card" id="temporal-card-bg">
-                    <span class="label">Temporal (Inst.)</span>
-                    <h3 id="temporal-value">0 <span class="unit">mL/Min</span></h3>
-                </div>
-            </section>
-
-            <!-- Base: Gráfico de Histograma -->
-            <footer class="chart-panel card">
-                <span class="label">Histograma de Consumo por Km</span>
-                <div class="canvas-container">
-                    <canvas id="histograma"></canvas>
-                </div>
-            </footer>
-        </div>
-
-        <!-- ================= TELA 2: HISTÓRICO DE VIAGENS ================= -->
-        <div id="view-history" class="view-section">
-            <header class="view-header">
-                <h2>Histórico de Viagens</h2>
-                <span class="label">Seus trajetos anteriores</span>
-            </header>
-            <div class="card history-card-container">
-                <ul id="history-list">
-                    <li class="history-item">
-                        <div class="history-info">
-                            <strong>Corsa Wind - Rota Urbana</strong>
-                            <small>Hoje, 14:30 • 4.2 km</small>
-                        </div>
-                        <div class="history-stats">
-                            <span class="status-good">14.2 Km/L</span>
-                            <small>R$ 4,20</small>
-                        </div>
-                    </li>
-                    <!-- Mais itens serão injetados via JS dinamicamente -->
-                </ul>
-            </div>
-        </div>
-
-        <!-- ================= TELA 3: CONFIGURAÇÕES E PERFIL ================= -->
-        <div id="view-settings" class="view-section">
-            <header class="view-header">
-                <h2>Configurações</h2>
-                <span class="label">Parâmetros do Veículo e Custos</span>
-            </header>
+        <!-- SEÇÃO PRINCIPAL (Abas ou Visualização Única) -->
+        <div class="view-section active" id="view-dashboard">
             
-            <div class="card settings-card">
-                <div class="input-group">
-                    <label for="preco-combustivel">Preço do Combustível (R$/L)</label>
-                    <input type="number" id="preco-combustivel" value="5.89" step="0.01">
+            <!-- PAINEL SUPERIOR: Métricas do Veículo -->
+            <section class="top-panel">
+                <div class="card">
+                    <span class="label">Rotação do Motor</span>
+                    <h2 id="rpm-value">0</h2>
+                    <div class="sub-metric">RPM Atual</div>
                 </div>
-                
-                <div class="input-group">
-                    <label for="perfil-veiculo">Perfil do Veículo</label>
-                    <input type="text" id="perfil-veiculo" value="Chevrolet Corsa 1.0 MPFI">
+                <div class="card">
+                    <span class="label">Velocidade Atual</span>
+                    <h2 id="speed-value">0 <span class="unit">km/h</span></h2>
+                    <div class="sub-metric">GPS / OBD</div>
                 </div>
+            </section>
 
-                <div class="input-group">
-                    <label for="fator-sensor">Fator K dos Sensores (Pulsos/L)</label>
-                    <input type="number" id="fator-sensor" value="660">
-                </div>
+            <!-- PAINEL CENTRAL: Consumo Geral e Custo -->
+            <section class="center-panel card">
+                <span class="label">Eficiência Geral da Viagem</span>
+                <h1 id="efficiency-value">0.0 <span class="unit">Km/L</span></h1>
+                <div class="sub-metric">Total Consumido: <strong id="total-litros">0.00</strong> Litros</div>
+                <div class="sub-metric-cost">Custo Estimado: <strong id="total-custo">R$ 0,00</strong></div>
+            </section>
 
-                <button id="btn-salvar-config" class="btn-primary">Salvar Alterações</button>
-            </div>
+            <!-- PAINEL INFERIOR: Métricas Avançadas de Fluxo (YF-B1) -->
+            <section class="bottom-panel">
+                <div class="card">
+                    <span class="label">Consumo Espacial</span>
+                    <h3 id="spatial-value">0 <span class="unit">mL/Km</span></h3>
+                    <div class="sub-metric">Taxa por Distância</div>
+                </div>
+                <div class="card">
+                    <span class="label">Consumo Temporal</span>
+                    <h3 id="temporal-value">0.0 <span class="unit">mL/Min</span></h3>
+                    <div class="sub-metric">Taxa por Tempo</div>
+                </div>
+            </section>
+
+            <!-- PAINEL DO GRÁFICO DINÂMICO -->
+            <section class="card chart-panel">
+                <span class="label">Histograma de Consumo (Tempo Real)</span>
+                <div class="canvas-container">
+                    <canvas id="graficoConsumo"></canvas>
+                </div>
+            </section>
+
         </div>
 
-        <!-- ================= MENU DE NAVEGAÇÃO INFERIOR ================= -->
+        <!-- MENU DE NAVEGAÇÃO INFERIOR -->
         <nav class="bottom-nav">
-            <button class="nav-btn active" onclick="mudarAba('dashboard')">📊 Painel</button>
-            <button class="nav-btn" onclick="mudarAba('history')">📜 Histórico</button>
-            <button class="nav-btn" onclick="mudarAba('settings')">⚙️ Ajustes</button>
+            <button class="nav-btn active">📊 Dashboard</button>
+            <button class="nav-btn" onclick="window.location.href='../frota-web/index.html'">🏢 Painel Frotas (B2B)</button>
         </nav>
+
     </div>
-    
-    <!-- Scripts -->
-    <script type="module" src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <script type="module" src="simulador.js"></script>
-    <script type="module" src="app.js"></script>
+
+    <!-- SCRIPTS DO SISTEMA (Ordem correta de carregamento) -->
+    <script src="simulador.js"></script>
+    <script src="app.js"></script>
 </body>
 </html>
