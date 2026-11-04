@@ -5,6 +5,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>FleetManager Pro - Telemetria B2B</title>
     <link rel="stylesheet" href="fleet-style.css">
+    <!-- Leaflet CSS (Mapa Gratutio) -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+
     <script src="auth.js"></script>
     <script>
         // Protege a página logo na abertura
@@ -135,26 +138,52 @@
                 </section>
             </div>
 
-            <!-- ================= ABA 2: OTIMIZAÇÃO DE ROTAS (IA) ================= -->
+            <!-- ================= ABA 2: OTIMIZAÇÃO DE ROTAS (MÚLTIPLAS PARADAS + MAPA LIVRE) ================= -->
             <div id="tab-routes" class="tab-content" style="display: none;">
                 <header class="fleet-header">
                     <div>
-                        <h1>Otimização de Trajetos por Inteligência Artificial</h1>
-                        <span class="sub-title">Algoritmo preditivo de consumo e desvio de tráfego</span>
+                        <h1>Roteirização Inteligente & Múltiplas Paradas</h1>
+                        <span class="sub-title">Cálculo de rota com pontos intermediários otimizados</span>
                     </div>
                 </header>
-                <div class="fleet-card" style="margin-top: 20px;">
-                    <h3>🤖 Sugestões Ativas da IA para a Frota</h3>
-                    <p style="color: var(--text-muted); margin: 10px 0 20px 0; font-size: 0.9rem;">
-                        O motor de IA analisou o histórico de telemetria dos últimos 7 dias e identificou gargalos de consumo em trechos urbanos.
-                    </p>
-                    <div style="background: #111; padding: 15px; border-radius: 8px; border-left: 3px solid var(--neon-blue); margin-bottom: 12px;">
-                        <strong style="color: var(--neon-blue);">Rota 04 - Zona Leste / Centro</strong>
-                        <p style="font-size: 0.85rem; color: #ccc; margin-top: 5px;">A IA sugere desviar da Av. Principal às 17h para evitar marchas lentas recorrentes. <strong>Economia projetada: 14% de combustível.</strong></p>
+
+                <div class="dashboard-split" style="margin-top: 20px;">
+                    <!-- Coluna de Inserção de Endereços / Paradas -->
+                    <div class="fleet-card" style="flex: 1;">
+                        <h3>📍 Roteiro de Entregas</h3>
+                        <p style="color: var(--text-muted); font-size: 0.85rem; margin-bottom: 15px;">
+                            Defina a origem e adicione quantos destinos forem necessários para a rota da frota.
+                        </p>
+                        
+                        <div class="form-group" style="margin-bottom: 12px;">
+                            <label style="font-size: 0.75rem; color: var(--text-muted);">Ponto de Partida (Origem)</label>
+                            <input type="text" id="ponto-origem" value="Santa Isabel, SP" style="width: 100%; background: #111; border: 1px solid var(--border-color); padding: 10px; border-radius: 6px; color: #fff;">
+                        </div>
+
+                        <!-- Container dinâmico onde os destinos adicionados vão aparecer -->
+                        <div id="destinos-container">
+                            <div class="form-group destino-item" style="margin-bottom: 10px;">
+                                <label style="font-size: 0.75rem; color: var(--text-muted);">Destino 1</label>
+                                <input type="text" class="input-destino" value="Guarulhos, SP" style="width: 100%; background: #111; border: 1px solid var(--border-color); padding: 10px; border-radius: 6px; color: #fff;">
+                            </div>
+                            <div class="form-group destino-item" style="margin-bottom: 12px;">
+                                <label style="font-size: 0.75rem; color: var(--text-muted);">Destino 2</label>
+                                <input type="text" class="input-destino" value="Mogi das Cruzes, SP" style="width: 100%; background: #111; border: 1px solid var(--border-color); padding: 10px; border-radius: 6px; color: #fff;">
+                            </div>
+                        </div>
+
+                        <button onclick="adicionarCampoDestino()" style="background: transparent; border: 1px dashed var(--neon-blue); color: var(--neon-blue); width: 100%; padding: 8px; border-radius: 6px; cursor: pointer; margin-bottom: 15px; font-size: 0.85rem;">+ Adicionar Outra Parada</button>
+
+                        <button onclick="calcularRotaMultiplasParadas()" class="btn-login" style="width: 100%;">🚀 Calcular Rota Otimizada</button>
+                        
+                        <div id="rota-info-resultado" style="margin-top: 15px; font-size: 0.85rem; color: #ddd; line-height: 1.5;">
+                            <!-- O resultado de distância e tempo total aparecerá aqui -->
+                        </div>
                     </div>
-                    <div style="background: #111; padding: 15px; border-radius: 8px; border-left: 3px solid var(--neon-blue);">
-                        <strong style="color: var(--neon-blue);">Rota 12 - Rodoanel Norte</strong>
-                        <p style="font-size: 0.85rem; color: #ccc; margin-top: 5px;">Velocidade de cruzeiro ideal recomendada pela IA para este trecho: <strong>75 km/h</strong> (ponto ótimo de eficiência do motor).</p>
+
+                    <!-- Coluna do Mapa Gratuito corrigida (Sem Erro de API Key) -->
+                    <div class="fleet-card" style="flex: 2; padding: 10px;">
+                        <div id="leaflet-map" style="width: 100%; height: 480px; border-radius: 8px;"></div>
                     </div>
                 </div>
             </div>
@@ -179,6 +208,8 @@
         </main>
     </div>
 
+    <!-- Leaflet JS -->
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
     <script src="fleet-app.js"></script>
 </body>
 </html>
