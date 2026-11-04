@@ -4,6 +4,17 @@
  * e cálculos dinâmicos de custos e estatísticas.
  * ========================================================== */
 
+import { CONFIG, calcularConsumoEspacial, verificarMarchaLenta } from '../shared/telemetry-core.js';
+
+// Exemplo de uso prático na telemetria:
+const pulsosAtuais = 900;
+const distanciaAtual = 2.5; // km
+const consumo = calcularConsumoEspacial(pulsosAtuais, distanciaAtual);
+
+console.log(`Versão rodando: ${CONFIG.VERSAO_SISTEMA}`);
+console.log(`Consumo calculado: ${consumo} L/Km`);
+
+
 // 1. Inicialização do Gráfico de Histograma (Chart.js)
 const ctx = document.getElementById('histograma').getContext('2d');
 const graficoConsumo = new Chart(ctx, {

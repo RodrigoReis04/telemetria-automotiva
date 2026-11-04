@@ -2,6 +2,17 @@
  * CONTROLADOR DO DASHBOARD DE FROTAS (B2B)
  * ========================================================== */
 
+import { CONFIG, calcularConsumoEspacial, verificarMarchaLenta } from '../shared/telemetry-core.js';
+
+// Exemplo de uso prático na telemetria:
+const pulsosAtuais = 900;
+const distanciaAtual = 2.5; // km
+const consumo = calcularConsumoEspacial(pulsosAtuais, distanciaAtual);
+
+console.log(`Versão rodando: ${CONFIG.VERSAO_SISTEMA}`);
+console.log(`Consumo calculado: ${consumo} L/Km`);
+
+
 function selecionarVeiculo(nomeVeiculo, motorista, velocidade, consumo, status) {
     // Atualiza o título do card de telemetria
     document.getElementById('selected-vehicle-title').innerText = `Telemetria: ${nomeVeiculo}`;
