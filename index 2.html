@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Telemetria Automotiva - Midnight Tech</title>
+    <link rel="stylesheet" href="style.css">
+    <!-- Chart.js para o gráfico de consumo em tempo real -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+    <div class="dashboard-container">
+        
+        <!-- BARRA SUPERIOR DE STATUS -->
+        <header class="status-bar">
+            <span id="system-status" class="badge-online">● SISTEMA ATIVO</span>
+            <span id="trip-time">Tempo: 00:00</span>
+            <button id="btn-fullscreen" class="btn-fullscreen" onclick="alternarTelaCheia()" title="Tela Cheia">⛶</button>
+        </header>
+
+        <!-- SEÇÃO PRINCIPAL (Abas ou Visualização Única) -->
+        <div class="view-section active" id="view-dashboard">
+            
+            <!-- PAINEL SUPERIOR: Métricas do Veículo -->
+            <section class="top-panel">
+                <div class="card">
+                    <span class="label">Rotação do Motor</span>
+                    <h2 id="rpm-value">0</h2>
+                    <div class="sub-metric">RPM Atual</div>
+                </div>
+                <div class="card">
+                    <span class="label">Velocidade Atual</span>
+                    <h2 id="speed-value">0 <span class="unit">km/h</span></h2>
+                    <div class="sub-metric">GPS / OBD</div>
+                </div>
+            </section>
+
+            <!-- PAINEL CENTRAL: Consumo Geral e Custo -->
+            <section class="center-panel card">
+                <span class="label">Eficiência Geral da Viagem</span>
+                <h1 id="efficiency-value">0.0 <span class="unit">Km/L</span></h1>
+                <div class="sub-metric">Total Consumido: <strong id="total-litros">0.00</strong> Litros</div>
+                <div class="sub-metric-cost">Custo Estimado: <strong id="total-custo">R$ 0,00</strong></div>
+            </section>
+
+            <!-- PAINEL INFERIOR: Métricas Avançadas de Fluxo (YF-B1) -->
+            <section class="bottom-panel">
+                <div class="card">
+                    <span class="label">Consumo Espacial</span>
+                    <h3 id="spatial-value">0 <span class="unit">mL/Km</span></h3>
+                    <div class="sub-metric">Taxa por Distância</div>
+                </div>
+                <div class="card">
+                    <span class="label">Consumo Temporal</span>
+                    <h3 id="temporal-value">0.0 <span class="unit">mL/Min</span></h3>
+                    <div class="sub-metric">Taxa por Tempo</div>
+                </div>
+            </section>
+
+            <!-- PAINEL DO GRÁFICO DINÂMICO -->
+            <section class="card chart-panel">
+                <span class="label">Histograma de Consumo (Tempo Real)</span>
+                <div class="canvas-container">
+                    <canvas id="graficoConsumo"></canvas>
+                </div>
+            </section>
+
+        </div>
+
+        <!-- MENU DE NAVEGAÇÃO INFERIOR -->
+        <nav class="bottom-nav">
+            <button class="nav-btn active">📊 Dashboard</button>
+            <button class="nav-btn" onclick="window.location.href='../frota-web/index.html'">🏢 Painel Frotas (B2B)</button>
+        </nav>
+
+    </div>
+
+    <!-- SCRIPTS DO SISTEMA (Ordem correta de carregamento) -->
+    <script src="simulador.js"></script>
+    <script src="app.js"></script>
+</body>
+</html>
