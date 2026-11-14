@@ -4,20 +4,26 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>FleetManager Pro - Telemetria B2B</title>
+    
+    <!-- Folha de estilos principal do Design System Midnight Tech -->
     <link rel="stylesheet" href="fleet-style.css">
-    <!-- Leaflet CSS (Mapa Gratutio) -->
+    
+    <!-- Leaflet CSS: Biblioteca open-source para renderização dos mapas gratuitos -->
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
 
+    <!-- Módulo de Segurança e Autenticação (Route Guard) -->
     <script src="auth.js"></script>
     <script>
-        // Protege a página logo na abertura
+        // Bloqueia o acesso direto à página caso não exista um token JWT válido na sessão
         verificarAutenticacao();
     </script>
 </head>
 <body>
     <div class="fleet-container">
         
-        <!-- BARRA LATERAL DE NAVEGAÇÃO CORPORATIVA -->
+        <!-- =====================================================================
+             BARRA LATERAL DE NAVEGAÇÃO CORPORATIVA (SPA MENU)
+             ===================================================================== -->
         <aside class="sidebar">
             <h2>Fleet<span>Manager</span></h2>
             <ul class="menu-list">
@@ -25,120 +31,144 @@
                 <li id="menu-routes" onclick="mudarAba('routes')">🗺️ Otimização de Rotas (IA)</li>
                 <li id="menu-reports" onclick="mudarAba('reports')">📈 Relatórios & Laudos de IA</li>
             </ul>
+            
+            <!-- Botão de Encerramento de Sessão -->
             <div style="margin-top: auto; padding-top: 20px; border-top: 1px solid var(--border-color);">
-                <button onclick="realizarLogout()" style="width: 100%; background: transparent; border: 1px solid var(--alert-red); color: var(--alert-red); padding: 8px; border-radius: 6px; cursor: pointer; font-weight: 500;">Sair da Conta</button>
+                <button onclick="realizarLogout()" style="width: 100%; background: transparent; border: 1px solid var(--alert-red); color: var(--alert-red); padding: 8px; border-radius: 6px; cursor: pointer; font-weight: 500;">
+                    Sair da Conta
+                </button>
             </div>
         </aside>
 
-        <!-- CONTEÚDO PRINCIPAL DO GESTOR -->
+        <!-- =====================================================================
+             ÁREA DE CONTEÚDO PRINCIPAL DO GESTOR DE FROTAS
+             ===================================================================== -->
         <main class="main-content">
             
-            <!-- ================= ABA 1: MONITORAMENTO AO VIVO ================= -->
+            <!-- =================================================================
+                 ABA 1: CENTRAL DE OPERAÇÕES (22 VEÍCULOS + CRUD + TELEMETRIA VIVO)
+                 ================================================================= -->
             <div id="tab-live" class="tab-content active">
-                <header class="fleet-header">
+                
+                <!-- Cabeçalho com Controles de Simulação e Cadastro -->
+                <header class="fleet-header" style="flex-wrap: wrap; gap: 12px;">
                     <div>
                         <h1>Central de Operações da Frota</h1>
-                        <span class="sub-title">Monitoramento GSM/GPS em Tempo Real</span>
+                        <span class="sub-title">Telemetria Diferencial de Combustível & Rastreamento GSM/GPS</span>
                     </div>
-                    <span class="badge-server">Backend Java Spring Boot: <strong style="color: #00ff66;">● ONLINE (Port 8080)</strong></span>
+                    <div style="display: flex; align-items: center; gap: 10px; flex-wrap: wrap;">
+                        <span class="badge-server">API Spring Boot: <strong style="color: #00ff66;">● PRONTA (Port 8080)</strong></span>
+                        
+                        <!-- Botão para pausar/retomar a oscilação de telemetria em tempo real -->
+                        <button id="btn-toggle-live" onclick="alternarSimulacaoAoVivo()" style="background: rgba(0, 229, 255, 0.12); border: 1px solid var(--neon-blue); color: var(--neon-blue); padding: 8px 12px; border-radius: 6px; cursor: pointer; font-weight: 600; font-size: 0.85rem;">
+                            ⏸ Pausar Ao Vivo
+                        </button>
+                        
+                        <!-- Botão que abre o formulário rápido de cadastro de veículo (CRUD) -->
+                        <button onclick="abrirModalCadastro()" class="btn-login" style="width: auto; padding: 8px 14px; margin: 0; font-size: 0.85rem;">
+                            + Novo Veículo
+                        </button>
+                    </div>
                 </header>
 
-                <!-- Cards Resumo Executivo da Frota -->
+                <!-- Formulário Rápido de Cadastro de Veículos (Oculto por padrão) -->
+                <div id="box-cadastro-veiculo" class="fleet-card" style="display: none; margin-bottom: 20px; border: 1px solid var(--neon-blue);">
+                    <h3 style="margin-bottom: 12px; color: var(--neon-blue);">➕ Cadastrar Novo Veículo na Frota</h3>
+                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 10px;">
+                        <input type="text" id="novo-modelo" placeholder="Modelo (Ex: Fiat Strada 1.3)" style="background: #111; border: 1px solid var(--border-color); padding: 10px; border-radius: 6px; color: #fff;">
+                        <input type="text" id="nova-placa" placeholder="Placa (Ex: BRA-2E19)" style="background: #111; border: 1px solid var(--border-color); padding: 10px; border-radius: 6px; color: #fff;">
+                        <input type="text" id="novo-motorista" placeholder="Nome do Motorista" style="background: #111; border: 1px solid var(--border-color); padding: 10px; border-radius: 6px; color: #fff;">
+                        <div style="display: flex; gap: 8px;">
+                            <button onclick="salvarNovoVeiculo()" class="btn-login" style="margin: 0; padding: 10px;">Salvar</button>
+                            <button onclick="fecharModalCadastro()" style="background: #222; border: 1px solid #444; color: #ccc; padding: 10px 14px; border-radius: 6px; cursor: pointer;">Cancelar</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Cards de KPIs Executivos (Atualizados dinamicamente pelo fleet-app.js) -->
                 <section class="metrics-grid">
                     <div class="fleet-card">
                         <span class="label">Veículos Conectados</span>
-                        <h2>12 <span class="unit">/ 15</span></h2>
+                        <h2 id="kpi-total-veiculos">22 <span class="unit">/ 22</span></h2>
                     </div>
                     <div class="fleet-card">
                         <span class="label">Eficiência Média da Frota</span>
-                        <h2>13.8 <span class="unit">Km/L</span></h2>
+                        <h2 id="kpi-media-consumo">11.4 <span class="unit">Km/L</span></h2>
                     </div>
                     <div class="fleet-card">
-                        <span class="label">Custo Total Hoje</span>
-                        <h2>R$ 482,50</h2>
+                        <span class="label">Fluxo Diferencial Total</span>
+                        <h2 id="kpi-fluxo-total">148.2 <span class="unit">L/h</span></h2>
                     </div>
                     <div class="fleet-card alert-card">
                         <span class="label">Alertas Críticos</span>
-                        <h2 style="color: var(--alert-red);">2 Ativos</h2>
+                        <h2 id="kpi-alertas" style="color: var(--alert-red);">3 Ativos</h2>
                     </div>
                 </section>
 
-                <!-- Área Dividida: Lista de Veículos + Telemetria Detalhada + Mapa -->
+                <!-- Área Dividida: Lista de Veículos + Telemetria Detalhada + Mapa GPS -->
                 <section class="dashboard-split">
-                    <div class="fleet-card vehicle-list-card">
-                        <h3>Frota Ativa</h3>
-                        <div class="search-box">
-                            <input type="text" placeholder="Filtrar por placa ou motorista...">
+                    
+                    <!-- Coluna 1: Lista Rolável e Filtrável da Frota -->
+                    <div class="fleet-card vehicle-list-card" style="display: flex; flex-direction: column; max-height: 540px;">
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+                            <h3>Frota Ativa</h3>
+                            <span id="contador-lista" style="font-size: 0.75rem; color: var(--text-muted);">22 veículos</span>
                         </div>
-                        <ul class="vehicle-ul">
-                            <li class="vehicle-item selected" onclick="selecionarVeiculo('Corsa 1.0 (ABC-1234)', 'João Silva', '82 km/h', '14.2 Km/L', 'Normal', event)">
-                                <div>
-                                    <strong>Chevrolet Corsa 1.0 <span class="plate">ABC-1234</span></strong>
-                                    <small>Motorista: João Silva • Em movimento</small>
-                                </div>
-                                <span class="status-good">14.2 Km/L</span>
-                            </li>
-                            <li class="vehicle-item" onclick="selecionarVeiculo('Fiat Uno 1.4 (XYZ-5678)', 'Carlos Souza', '0 km/h', '9.1 Km/L', 'Marcha Lenta', event)">
-                                <div>
-                                    <strong>Fiat Uno 1.4 <span class="plate">XYZ-5678</span></strong>
-                                    <small>Motorista: Carlos Souza • Marcha Lenta</small>
-                                </div>
-                                <span class="status-bad">9.1 Km/L</span>
-                            </li>
-                            <li class="vehicle-item" onclick="selecionarVeiculo('VW Gol 1.6 (DEF-9012)', 'Marcos Lima', '65 km/h', '12.5 Km/L', 'Normal', event)">
-                                <div>
-                                    <strong>VW Gol 1.6 <span class="plate">DEF-9012</span></strong>
-                                    <small>Motorista: Marcos Lima • Em cruzeiro</small>
-                                </div>
-                                <span class="status-good">12.5 Km/L</span>
-                            </li>
-                        </ul>
+                        <div class="search-box">
+                            <input type="text" id="filtro-veiculo" onkeyup="renderizarListaVeiculos()" placeholder="Filtrar por placa, modelo ou motorista...">
+                        </div>
+                        <!-- Lista preenchida dinamicamente via JavaScript -->
+                        <ul id="lista-veiculos-ul" class="vehicle-ul" style="overflow-y: auto; flex: 1; padding-right: 4px;"></ul>
                     </div>
 
+                    <!-- Coluna 2: Telemetria Detalhada do Veículo Focado & Log de Alertas -->
                     <div class="fleet-card telemetry-detail-card">
-                        <h3 id="selected-vehicle-title">Telemetria: Corsa 1.0 (ABC-1234)</h3>
+                        <h3 id="selected-vehicle-title">Telemetria: Chevrolet Corsa 1.0 (ABC-1234)</h3>
                         <div class="telemetry-grid">
                             <div class="mini-card">
                                 <span class="label">Velocidade GPS</span>
                                 <h4 id="tel-speed">82 <span class="unit">km/h</span></h4>
                             </div>
                             <div class="mini-card">
-                                <span class="label">RPM do Motor</span>
-                                <h4 id="tel-rpm">2400 <span class="unit">RPM</span></h4>
+                                <span class="label">Fluxo Diferencial</span>
+                                <h4 id="tel-fluxo">5.8 <span class="unit">L/h</span></h4>
                             </div>
                             <div class="mini-card">
-                                <span class="label">Consumo Instantâneo</span>
-                                <h4 id="tel-spatial">70 <span class="unit">mL/Km</span></h4>
+                                <span class="label">Consumo Real</span>
+                                <h4 id="tel-consumo">14.2 <span class="unit">Km/L</span></h4>
                             </div>
                             <div class="mini-card">
-                                <span class="label">Status Atual</span>
-                                <h4 id="tel-status" class="status-good">Operação Eficiente</h4>
+                                <span class="label">Status do Sensor</span>
+                                <h4 id="tel-status" class="status-good">Normal</h4>
                             </div>
                         </div>
                         
-                        <div class="alert-log-container">
-                            <span class="label">Log de Ocorrências e Alertas (GSM)</span>
-                            <ul class="alert-list">
-                                <li><span class="alert-time">14:42</span> Veículo XYZ-5678 permaneceu em marcha lenta por > 10 min.</li>
-                                <li><span class="alert-time">14:15</span> Rota iniciada para o veículo ABC-1234.</li>
-                            </ul>
+                        <!-- Feed dinâmico de ocorrências e alertas de fluxo/marcha lenta -->
+                        <div class="alert-log-container" style="margin-top: 15px;">
+                            <span class="label">Alertas Críticos & Anomalias de Fluxo (Clique para focar)</span>
+                            <ul id="feed-alertas-ul" class="alert-list" style="max-height: 210px; overflow-y: auto; margin-top: 8px;"></ul>
                         </div>
                     </div>
 
+                    <!-- Coluna 3: Mapa Geográfico Multi-Veículos (Leaflet + CARTO Dark) -->
                     <div class="fleet-card map-card">
-                        <h3>Rastreamento Geográfico (GPS)</h3>
-                        <!-- Substituído o texto estático por um container de mapa real -->
-                        <div id="live-map" style="width: 100%; height: 350px; border-radius: 8px;"></div>
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+                            <h3>Rastreamento Geográfico (GPS)</h3>
+                            <span style="font-size: 0.75rem; color: #00ff88;">● Satélite Ativo</span>
+                        </div>
+                        <div id="live-map" style="width: 100%; height: 380px; border-radius: 8px;"></div>
                     </div>
                 </section>
             </div>
 
-            <!-- ================= ABA 2: OTIMIZAÇÃO DE ROTAS (MÚLTIPLAS PARADAS + MAPA LIVRE) ================= -->
+            <!-- =================================================================
+                 ABA 2: OTIMIZAÇÃO DE ROTAS (MÚLTIPLAS PARADAS + OSRM GRATUITO)
+                 ================================================================= -->
             <div id="tab-routes" class="tab-content" style="display: none;">
                 <header class="fleet-header">
                     <div>
                         <h1>Roteirização Inteligente & Múltiplas Paradas</h1>
-                        <span class="sub-title">Cálculo de rota com pontos intermediários otimizados</span>
+                        <span class="sub-title">Cálculo de rota com pontos intermediários otimizados via OpenStreetMap</span>
                     </div>
                 </header>
 
@@ -167,35 +197,43 @@
                             </div>
                         </div>
 
-                        <button onclick="adicionarCampoDestino()" style="background: transparent; border: 1px dashed var(--neon-blue); color: var(--neon-blue); width: 100%; padding: 8px; border-radius: 6px; cursor: pointer; margin-bottom: 15px; font-size: 0.85rem;">+ Adicionar Outra Parada</button>
+                        <button onclick="adicionarCampoDestino()" style="background: transparent; border: 1px dashed var(--neon-blue); color: var(--neon-blue); width: 100%; padding: 8px; border-radius: 6px; cursor: pointer; margin-bottom: 15px; font-size: 0.85rem;">
+                            + Adicionar Outra Parada
+                        </button>
 
-                        <button onclick="calcularRotaMultiplasParadas()" class="btn-login" style="width: 100%;">🚀 Calcular Rota Otimizada</button>
+                        <button onclick="calcularRotaMultiplasParadas()" class="btn-login" style="width: 100%;">
+                            🚀 Calcular Rota Otimizada
+                        </button>
                         
                         <div id="rota-info-resultado" style="margin-top: 15px; font-size: 0.85rem; color: #ddd; line-height: 1.5;">
                             <!-- O resultado de distância e tempo total aparecerá aqui -->
                         </div>
                     </div>
 
-                    <!-- Coluna do Mapa Gratuito corrigida (Sem Erro de API Key) -->
+                    <!-- Coluna do Mapa Gratuito (Leaflet) -->
                     <div class="fleet-card" style="flex: 2; padding: 10px;">
                         <div id="leaflet-map" style="width: 100%; height: 480px; border-radius: 8px;"></div>
                     </div>
                 </div>
             </div>
 
-            <!-- ================= ABA 3: RELATÓRIOS & LAUDOS DE IA ================= -->
+            <!-- =================================================================
+                 ABA 3: RELATÓRIOS & LAUDOS DE IA (ANÁLISE DA FROTA COMPLETA)
+                 ================================================================= -->
             <div id="tab-reports" class="tab-content" style="display: none;">
                 <header class="fleet-header">
                     <div>
                         <h1>Laudos de Desempenho (Gerados por IA)</h1>
-                        <span class="sub-title">Análise automatizada de comportamento de condução</span>
+                        <span class="sub-title">Auditoria automatizada de eficiência energética e comportamento de condução</span>
                     </div>
-                    <button onclick="gerarLaudoIA()" class="btn-login" style="width: auto; padding: 10px 20px; margin: 0;">⚡ Gerar Novo Laudo</button>
+                    <button onclick="gerarLaudoIA()" class="btn-login" style="width: auto; padding: 10px 20px; margin: 0;">
+                        ⚡ Gerar Novo Laudo
+                    </button>
                 </header>
                 <div class="fleet-card" style="margin-top: 20px;">
                     <h3>📋 Parecer Técnico Automatizado</h3>
                     <div id="laudo-ia-container" style="background: #111; padding: 20px; border-radius: 8px; margin-top: 15px; font-size: 0.9rem; color: #ddd; line-height: 1.6; border: 1px solid var(--border-color);">
-                        Clique em <strong>"Gerar Novo Laudo"</strong> para o motor de IA processar os dados e emitir o laudo de desempenho comportamental dos motoristas da frota.
+                        Clique em <strong>"Gerar Novo Laudo"</strong> para o motor de IA processar a telemetria diferencial dos veículos ativos e emitir o parecer gerencial.
                     </div>
                 </div>
             </div>
@@ -203,7 +241,7 @@
         </main>
     </div>
 
-    <!-- Leaflet JS -->
+    <!-- Scripts Principais (Leaflet + Lógica da Aplicação) -->
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
     <script src="fleet-app.js"></script>
 </body>
