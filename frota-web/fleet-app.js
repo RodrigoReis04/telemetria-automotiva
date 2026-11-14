@@ -208,3 +208,66 @@ function mudarAba(abaId) {
         if (menuReports) menuReports.classList.add('active');
     }
 }
+// Variável para o mapa ao vivo da Aba 1
+let liveMapInstance = null;
+let liveMarker = null;
+
+function initLiveMap() {
+    if (liveMapInstance) return;
+
+    // Inicializa o mapa na região central (Ex: São Paulo / Santa Isabel)
+    liveMapInstance = L.map('live-map').setView([-23.315, -46.221], 12);
+
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        attribution: '&copy; OpenStreetMap contributors',
+        maxZoom: 19
+    }).addTo(liveMapInstance);
+
+    // Adiciona o pino inicial do Corsa
+    liveMarker = L.marker([-23.315, -46.221]).addTo(liveMapInstance)
+        .bindPopup('<b>Chevrolet Corsa 1.0 (ABC-1234)</b><br>Status: Em movimento').openPopup();
+}
+
+// Atualiza a função de selecionar veículo para também mover o mapa ao vivo
+const originalSelecionarVeiculo = window.selecionarVeiculo;
+window.selecionarVeiculo = function(nomeVeiculo, motorista, velocidade, consumo, status, event) {
+    if (typeof originalSelecionarVeiculo === 'function') {
+        originalSelecionarVeiculo(nomeVeiculo, motorista, velocidade, consumo, status, event);
+    }
+
+    // Altera coordenadas simuladas com base no veículo escolhido para dar realismo
+    let lat = -23.315;
+    let lon = -46.221;
+    if(nomeVeiculo.includes('Fiat Uno')) { lat = -23.480; lon = -46.450; }
+    if(nomeVeiculo.includes('VW Gol')) { lat = -23.520; lon = -46.300; }
+
+    if (liveMapInstance) {
+        liveMapInstance.setView([lat, lon], 13);
+        if (liveMarker) {
+            liveMarker.setLatLng([lat, lon])
+                .setPopupContent(`<b>${nomeVeiculo}</b><br>Motorista: ${motorista}<br>Status: ${status}`)
+                .openPopup();
+        }
+    }
+};
+
+// Garante que o mapa ao vivo seja carregado ao abrir a aba 'live'
+const originalMudarAba2 = window.mudarAba;
+window.mudarAba = function(abaId) {
+    if (typeof originalMudarAba2 === 'function') {
+        originalMudarAba2(abaId);
+    }
+    if (abaId === 'live') {
+        setTimeout(() => {
+            initLiveMap();
+            if (liveMapInstance) liveMapInstance.invalidateSize();
+        }, 150);
+    }
+};
+
+// Inicializa o mapa ao vivo logo na carga inicial se a aba ativa for a 'live'
+document.addEventListener("DOMContentLoaded", () => {
+    setTimeout(() => {
+        initLiveMap();
+    }, 300);
+});
