@@ -1,7 +1,7 @@
 git status
 git add .
 git status
-git commit -m "fix: atualiza arquivos do projeto e layout responsivo"
+git commit -m "fix: atualiza arquivos do projeto e layout responsio"
 git push origin main
 
 
