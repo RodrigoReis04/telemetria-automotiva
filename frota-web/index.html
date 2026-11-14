@@ -248,25 +248,52 @@
         </main>
     </div>
 
-    <!-- Leaflet JS -->
+<!-- Leaflet JS -->
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-    <script src="fleet-app.js?v=4"></script>
+    <script src="fleet-app.js?v=5"></script>
 
     <script>
-        // Garante que qualquer camada antiga seja removida e força o carregamento do mapa Esri World Street Map
+        /**
+         * Garante que qualquer camada de tile antiga/inválida seja substituída pelo
+         * servidor oficial da Esri (World_Street_Map) tanto no mapa ao vivo quanto no mapa de rotas.
+         */
+        function aplicarCamadaEsriSegura(instanciaMapa) {
+            if (!instanciaMapa) return;
+            instanciaMapa.eachLayer(function(layer) {
+                if (layer._url) {
+                    instanciaMapa.removeLayer(layer);
+                }
+            });
+            L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Street_Map/MapServer/tile/{z}/{y}/{x}', {
+                attribution: 'Tiles &copy; Esri',
+                maxZoom: 18
+            }).addTo(instanciaMapa);
+        }
+
+        // Aplica no mapa da Aba 1 logo após o carregamento da página
         window.addEventListener('load', function() {
             setTimeout(function() {
-                if (typeof liveMapInstance !== 'undefined' && liveMapInstance) {
-                    liveMapInstance.eachLayer(function(layer) {
-                        if (layer._url) liveMapInstance.removeLayer(layer);
-                    });
-                    L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Street_Map/MapServer/tile/{z}/{y}/{x}', {
-                        attribution: 'Tiles &copy; Esri',
-                        maxZoom: 18
-                    }).addTo(liveMapInstance);
+                if (typeof liveMapInstance !== 'undefined') {
+                    aplicarCamadaEsriSegura(liveMapInstance);
                 }
-            }, 500);
+            }, 400);
         });
+
+        // Intercepta a troca de abas para garantir que o mapa da Aba 2 (Rotas) também receba a camada Esri limpa
+        const mudarAbaOriginal = window.mudarAba;
+        window.mudarAba = function(abaId) {
+            if (typeof mudarAbaOriginal === 'function') {
+                mudarAbaOriginal(abaId);
+            }
+            if (abaId === 'routes') {
+                setTimeout(function() {
+                    if (typeof mapInstance !== 'undefined' && mapInstance) {
+                        aplicarCamadaEsriSegura(mapInstance);
+                        mapInstance.invalidateSize();
+                    }
+                }, 250);
+            }
+        };
     </script>
 </body>
 </html>
