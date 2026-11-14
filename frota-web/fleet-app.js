@@ -203,7 +203,7 @@ function initLiveMap() {
     liveMapInstance = L.map('live-map').setView([-23.400, -46.380], 10);
 
     // Provedor CARTO Dark: Compatível com Midnight Tech e livre de bloqueios CORS/HTTPS
-    L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
+    L.tileLayer('https://{s}.server.arcgisonline.com/dark_all/{z}/{x}/{y}{r}.png', {
         attribution: '&copy; OpenStreetMap contributors &copy; CARTO',
         maxZoom: 19
     }).addTo(liveMapInstance);
@@ -301,7 +301,7 @@ function initLeafletMap() {
 
     mapInstance = L.map('leaflet-map').setView([-23.315, -46.221], 10);
 
-    L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
+    L.tileLayer('https://{s}.server.arcgisonline.com/dark_all/{z}/{x}/{y}{r}.png', {
         attribution: '&copy; OpenStreetMap contributors &copy; CARTO',
         maxZoom: 19
     }).addTo(mapInstance);
