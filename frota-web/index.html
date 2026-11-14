@@ -248,8 +248,25 @@
         </main>
     </div>
 
-    <!-- Scripts Principais (Leaflet + Lógica da Aplicação) -->
+    <!-- Leaflet JS -->
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-    <script src="fleet-app.js?v=3"></script>
+    <script src="fleet-app.js?v=4"></script>
+
+    <script>
+        // Garante que qualquer camada antiga seja removida e força o carregamento do mapa Esri World Street Map
+        window.addEventListener('load', function() {
+            setTimeout(function() {
+                if (typeof liveMapInstance !== 'undefined' && liveMapInstance) {
+                    liveMapInstance.eachLayer(function(layer) {
+                        if (layer._url) liveMapInstance.removeLayer(layer);
+                    });
+                    L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Street_Map/MapServer/tile/{z}/{y}/{x}', {
+                        attribution: 'Tiles &copy; Esri',
+                        maxZoom: 18
+                    }).addTo(liveMapInstance);
+                }
+            }, 500);
+        });
+    </script>
 </body>
 </html>
