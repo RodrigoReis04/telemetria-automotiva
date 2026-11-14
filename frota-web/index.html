@@ -11,6 +11,19 @@
     <!-- Leaflet CSS: Biblioteca open-source para renderização dos mapas gratuitos -->
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
 
+    <!-- Estilo customizado para converter o mapa gratuito do OpenStreetMap em Dark Mode via CSS (Zero API Key) -->
+    <style>
+        .leaflet-layer,
+        .leaflet-control-zoom-in,
+        .leaflet-control-zoom-out,
+        .leaflet-control-attribution {
+            filter: invert(100%) hue-rotate(180deg) brightness(95%) contrast(90%);
+        }
+        .leaflet-container {
+            background: #111 !important;
+        }
+    </style>
+
     <!-- Módulo de Segurança e Autenticação (Route Guard) -->
     <script src="auth.js"></script>
     <script>
@@ -150,7 +163,7 @@
                         </div>
                     </div>
 
-                    <!-- Coluna 3: Mapa Geográfico Multi-Veículos (Leaflet + CARTO Dark) -->
+                    <!-- Coluna 3: Mapa Geográfico Multi-Veículos (Leaflet + OpenStreetMap Dark) -->
                     <div class="fleet-card map-card">
                         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
                             <h3>Rastreamento Geográfico (GPS)</h3>
