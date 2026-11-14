@@ -8,19 +8,13 @@
     <!-- Folha de estilos principal do Design System Midnight Tech -->
     <link rel="stylesheet" href="fleet-style.css">
     
-    <!-- Leaflet CSS: Biblioteca open-source para renderização dos mapas gratuitos -->
+    <!-- Leaflet CSS: Biblioteca open-source para renderização dos mapas -->
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
 
-    <!-- Estilo customizado para converter o mapa gratuito do OpenStreetMap em Dark Mode via CSS (Zero API Key) -->
+    <!-- Ajuste visual do container do mapa para combinar com o tema escuro -->
     <style>
-        .leaflet-layer,
-        .leaflet-control-zoom-in,
-        .leaflet-control-zoom-out,
-        .leaflet-control-attribution {
-            filter: invert(100%) hue-rotate(180deg) brightness(95%) contrast(90%);
-        }
         .leaflet-container {
-            background: #111 !important;
+            background: #141414 !important;
         }
     </style>
 
@@ -163,7 +157,7 @@
                         </div>
                     </div>
 
-                    <!-- Coluna 3: Mapa Geográfico Multi-Veículos (Leaflet + OpenStreetMap Dark) -->
+                    <!-- Coluna 3: Mapa Geográfico Multi-Veículos (Leaflet + ArcGIS Dark) -->
                     <div class="fleet-card map-card">
                         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
                             <h3>Rastreamento Geográfico (GPS)</h3>
@@ -181,7 +175,7 @@
                 <header class="fleet-header">
                     <div>
                         <h1>Roteirização Inteligente & Múltiplas Paradas</h1>
-                        <span class="sub-title">Cálculo de rota com pontos intermediários otimizados via OpenStreetMap</span>
+                        <span class="sub-title">Cálculo de rota com pontos intermediários otimizados via OSRM</span>
                     </div>
                 </header>
 
